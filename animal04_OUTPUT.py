@@ -7,7 +7,7 @@ import os
 # ============================================================
 # 1️⃣ 1차 학습 모델 자동 찾기
 # ============================================================
-model_files = glob.glob('./animal_mobilenetv2_final_acc_0.9917.h5')
+model_files = glob.glob('./animal_mobilenetv2_final_acc_0.9479.h5')
 if not model_files:
     raise FileNotFoundError("1차 학습 모델 파일을 찾을 수 없습니다.")
 # 최신(혹은 마지막) 모델 선택
@@ -20,7 +20,24 @@ model = load_model(latest_model_path)
 # ============================================================
 # 2️⃣ 클래스 순서 및 이미지 크기
 # ============================================================
-categories = ['Bear', 'Cat', 'Dog', 'Horse', 'Rabbit', 'Turtle']
+categories = [
+    "Bear",
+    "Cat",
+    "Cattle",
+    "Chicken",
+    "Deer",
+    "Dog",
+    "Duck",
+    "Fox",
+    "Hamster",
+    "Horse",
+    "Lion",
+    "Monkey",
+    "Pig",
+    "Rabbit",
+    "Sheep",
+    "Turtle"
+]
 image_w = 128
 image_h = 128
 

@@ -8,7 +8,7 @@ from tensorflow.keras.models import load_model
 import numpy as np
 import glob
 
-form_window = uic.loadUiType('./cat_and_dog.ui')[0]
+form_window = uic.loadUiType('./animal_face_match.ui')[0]
 
 
 class AnimalClassifier:
@@ -23,7 +23,24 @@ class AnimalClassifier:
 
         self.model = load_model(self.model_path)
 
-        self.categories = ['Bear', 'Cat', 'Dog', 'Horse', 'Rabbit', 'Turtle']
+        self.categories = [
+    "Bear",
+    "Cat",
+    "Cattle",
+    "Chicken",
+    "Deer",
+    "Dog",
+    "Duck",
+    "Fox",
+    "Hamster",
+    "Horse",
+    "Lion",
+    "Monkey",
+    "Pig",
+    "Rabbit",
+    "Sheep",
+    "Turtle"
+]
         self.image_w = 128
         self.image_h = 128
 

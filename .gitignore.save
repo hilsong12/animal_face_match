@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# PyCharm 설정파일
+.idea/
+
+# 가상환경
+venv/
+.venv/
+
+# 데이터/모델 파일 (용량 크고 코드는 아니기 때문에 업로드 No)
+*.npy
+*.h5
+*.npz
+*.jpg
+*.png
+
+# Jupyter checkpoint
+.ipynb_checkpoints/
+
+# OS 파일
+.DS_Store
+Thumbs.db

@@ -14,7 +14,8 @@ form_window = uic.loadUiType('./animal_face_match.ui')[0]
 class AnimalClassifier:
     def __init__(self):
 
-        model_files = glob.glob('./animal_mobilenetv2_final_acc_*.h5')
+        # model_files = glob.glob('./animal_mobilenetv2_final_acc_*.h5')
+        model_files = glob.glob('./animal_mobilenetv2_final_acc_0.9385.h5')
         if not model_files:
             raise FileNotFoundError("MobilenetV2 모델 파일을 찾을 수 없습니다.")
 
@@ -89,7 +90,7 @@ class Exam(QWidget, form_window):
             self,
             'Open Image',
             '/home/leejiseok/Downloads',
-            'Image Files(*.jpg);;All Files(*.*)'
+            'Image Files(*.jpg *.png);;All Files(*.*)'
         )
 
         file_path = self.path[0]

@@ -7,7 +7,7 @@ import os
 # ============================================================
 # 1️⃣ 1차 학습 모델 자동 찾기
 # ============================================================
-model_files = glob.glob('./animal_mobilenetv2_final_acc_0.9479.h5')
+model_files = glob.glob('./animal_mobilenetv2_final_acc_0.9385.h5')
 if not model_files:
     raise FileNotFoundError("1차 학습 모델 파일을 찾을 수 없습니다.")
 # 최신(혹은 마지막) 모델 선택

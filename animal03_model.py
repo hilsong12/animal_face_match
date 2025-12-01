@@ -7,7 +7,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import matplotlib.pyplot as plt
-from sklearn.utils import class_weight
 
 # ============================================================
 # 1) 데이터 불러오기
@@ -21,23 +20,12 @@ Y_test  = np.load(base_path + 'animal_multi_Y_test.npy')
 
 num_classes = 16
 
-# MobileNetV2 [-1,1] 입력
+# MobileNetV2는 [-1,1] 입력이므로 변환 필요
 X_train = preprocess_input(X_train * 255)
 X_test  = preprocess_input(X_test * 255)
 
 # ============================================================
-# class_weight 계산
-# ============================================================
-class_weights = class_weight.compute_class_weight(
-    class_weight='balanced',
-    classes=np.unique(Y_train),
-    y=Y_train
-)
-class_weights = dict(enumerate(class_weights))
-print("\n[클래스 가중치]", class_weights)
-
-# ============================================================
-# 2) 데이터 증강
+# 2) 정상적/적당한 데이터 증강 설정
 # ============================================================
 datagen = ImageDataGenerator(
     rotation_range=20,
@@ -51,14 +39,14 @@ datagen = ImageDataGenerator(
 train_gen = datagen.flow(X_train, Y_train, batch_size=32)
 
 # ============================================================
-# 3) MobileNetV2 모델 구성 (Freeze)
+# 3) MobileNetV2 모델 구성 (초기 Freeze)
 # ============================================================
 base_model = MobileNetV2(
     input_shape=(128, 128, 3),
     include_top=False,
     weights='imagenet'
 )
-base_model.trainable = False
+base_model.trainable = False  # 초기엔 Freeze
 
 model = Sequential([
     base_model,
@@ -77,18 +65,28 @@ model.compile(
     metrics=['accuracy']
 )
 
-early_stopping = EarlyStopping(monitor='val_accuracy', patience=6, restore_best_weights=True)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6)
+# callback
+early_stopping = EarlyStopping(
+    monitor='val_accuracy',
+    patience=6,
+    restore_best_weights=True
+)
+
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.5,
+    patience=3,
+    min_lr=1e-6
+)
 
 # ============================================================
-# 4) 1단계 Freeze 학습
+# 4) 1단계: Freeze 학습
 # ============================================================
 print("\n=== 1단계: Freeze 학습 시작 ===")
 history1 = model.fit(
     train_gen,
     epochs=20,
     validation_data=(X_test, Y_test),
-    class_weight=class_weights,
     callbacks=[early_stopping, reduce_lr]
 )
 
@@ -98,7 +96,7 @@ print("Loss:", score[0])
 print("Acc :", score[1])
 
 # ============================================================
-# 5) 2단계 Fine-tuning
+# 5) 2단계: Fine-Tuning (상위 30개 Layer Unfreeze)
 # ============================================================
 print("\n=== 2단계: Fine-Tuning ===")
 base_model.trainable = True
@@ -107,7 +105,7 @@ for layer in base_model.layers[:-30]:
 
 model.compile(
     loss='sparse_categorical_crossentropy',
-    optimizer=Adam(5e-5),
+    optimizer=Adam(5e-5),   # 낮은 학습률
     metrics=['accuracy']
 )
 
@@ -115,7 +113,6 @@ history2 = model.fit(
     train_gen,
     epochs=20,
     validation_data=(X_test, Y_test),
-    class_weight=class_weights,
     callbacks=[early_stopping, reduce_lr]
 )
 
@@ -124,10 +121,11 @@ print("\n>> Fine-Tuning 최종 결과")
 print("Loss:", score[0])
 print("Acc :", score[1])
 
+# 모델 저장
 model.save(f'./animal_mobilenetv2_final_acc_{score[1]:.4f}.h5')
 
 # ============================================================
-# 6) 그래프
+# 6) 학습 그래프 출력
 # ============================================================
 plt.figure(figsize=(12,5))
 
